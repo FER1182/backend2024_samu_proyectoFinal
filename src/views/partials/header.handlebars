@@ -5,14 +5,14 @@
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-   
+
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mx-auto">
-        {{#if isNotAdmin}}
+
         <li class="nav-item">
           <a class="nav-link" href="/api/products">Productos</a>
         </li>
-        {{/if}}
+
         <li class="nav-item">
           <a class="nav-link" href="/contacto">Contactos</a>
         </li>
@@ -28,12 +28,11 @@
           <a class="nav-link" href="/current">Current</a>
         </li>
 
-        {{#if isNotUser}}
         <li class="nav-item">
           <a class="nav-link" href="/api/products/realtimeproducts">Agregar productos</a>
         </li>
-        {{/if}}
-        
+
+
       </ul>
     </div>
   </div>
