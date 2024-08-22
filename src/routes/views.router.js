@@ -67,6 +67,9 @@ router.get("/current",(req, res, next) => {passport.authenticate("jwt", { sessio
     res.render("profile", { user, isAdmin, isPremium, isUser });
   }
 );
+app.get('/success', (req, res) => {
+  res.render('success');
+});
 
 router.get("/loggerTest", (req, res) => {
   req.logger.fatal("mensaje de fatal");

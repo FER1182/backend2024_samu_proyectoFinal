@@ -66,8 +66,8 @@ export default class UserController {
         maxAge: 3600000,
         httpOnly: true,
       });
-      //res.status(201).json(user);
-      res.redirect("/login");
+   
+      res.render('success');
     } catch (error) {
       res.status(500).send(`Error al crear el usuario ${error.message}`);
     }
