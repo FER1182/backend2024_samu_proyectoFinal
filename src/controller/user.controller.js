@@ -67,7 +67,7 @@ export default class UserController {
         httpOnly: true,
       });
       //res.status(201).json(user);
-      res.redirect("/api/products");
+      res.redirect("/login");
     } catch (error) {
       res.status(500).send(`Error al crear el usuario ${error.message}`);
     }
