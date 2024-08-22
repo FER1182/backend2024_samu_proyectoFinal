@@ -1,0 +1,21 @@
+h1{
+    color:blue;
+    text-align: center;
+}
+h2{
+    color:blue;
+    text-align: center;
+}
+.product {
+    margin: 20px;
+}
+.card-img-top {
+    object-fit: cover;
+    height: 200px;
+    
+} 
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}

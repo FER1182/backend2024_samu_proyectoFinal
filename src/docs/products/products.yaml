@@ -1,0 +1,311 @@
+paths:
+  /api/products:
+    get:
+      tags:
+        - Product
+      summary: Obtiene todos los productos con paginación y filtros.
+      description: Obtener una lista de productos con paginación y filtros aplicados.
+      operationId: getProducts
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Número de página para la paginación.
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Número de productos por página.
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: sort
+          in: query
+          description: Criterio de ordenación de los productos.
+          required: false
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: Filtros para los productos.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de productos obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productoFinal:
+                    type: array
+                    items:
+                      $ref: '#components/schemas/Product'
+                  hasPrevPage:
+                    type: boolean
+                  hasNextPage:
+                    type: boolean
+                  prevPage:
+                    type: integer
+                  nextPage:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  limit:
+                    type: integer
+                  titulo:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      idCart:
+                        type: string
+        '500':
+          description: Error interno del servidor.
+  
+    post:
+      tags:
+        - Product
+      summary: Crea un nuevo producto.
+      description: Agrega un nuevo producto a la base de datos. Solo accesible para roles admin y premium.
+      operationId: addProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/createProduct'
+      responses:
+        '201':
+          description: Producto creado con éxito.
+        '401':
+          description: No autorizado para agregar productos.
+        '500':
+          description: Error interno del servidor.
+
+  /api/products/{pid}:
+    get:
+      tags:
+        - Product
+      summary: Obtiene un producto por ID.
+      description: Obtiene los detalles de un producto específico por su ID.
+      operationId: getProductById
+      security:
+        - jwtAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalles del producto obtenidos con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Product'
+        '404':
+          description: Producto no encontrado.
+        '500':
+          description: Error interno del servidor.
+
+    put:
+      tags:
+        - Product
+      summary: Actualiza un producto existente.
+      description: Actualiza un producto existente por ID. Solo accesible para roles admin y premium.
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/updateProduct'
+      responses:
+        '200':
+          description: Producto actualizado con éxito.
+        '404':
+          description: Producto no encontrado.
+        '403':
+          description: No autorizado para actualizar el producto.
+        '500':
+          description: Error interno del servidor.
+
+    delete:
+      tags:
+        - Product
+      summary: Elimina un producto por ID.
+      description: Elimina un producto por ID. Solo accesible para roles admin y premium con permisos específicos.
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado con éxito.
+        '404':
+          description: Producto no encontrado.
+        '403':
+          description: No autorizado para eliminar el producto.
+        '500':
+          description: Error interno del servidor.
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del producto
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        img:
+          type: string
+          description: Imagen del producto
+        code:
+          type: string
+          description: Código único del producto
+        stock:
+          type: integer
+          description: Cantidad disponible del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Estado del producto (activo/inactivo)
+        owner:
+          type: object
+          properties:
+            role:
+              type: string
+              enum:
+                - admin
+                - premium
+              description: Rol del usuario que posee el producto
+            userId:
+              type: string
+              description: ID del usuario que posee el producto
+      example:
+        _id: "60d21b4667d0d8992e610c85"
+        title: "Producto Ejemplo"
+        description: "Descripción del producto de ejemplo"
+        price: 99.99
+        img: "http://example.com/image.jpg"
+        code: "PROD123"
+        stock: 100
+        category: "Electrónica"
+        status: true
+        owner:
+          role: "premium"
+          userId: "60d21b4667d0d8992e610c86"
+
+  requestBodies:
+    createProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        img:
+          type: string
+          description: Imagen del producto
+        code:
+          type: string
+          description: Código único del producto
+        stock:
+          type: integer
+          description: Cantidad disponible del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Estado del producto (activo/inactivo)
+      example:
+        title: "Nuevo Producto"
+        description: "Descripción del nuevo producto"
+        price: 50.00
+        img: "http://example.com/newimage.jpg"
+        code: "NEW123"
+        stock: 200
+        category: "Hogar"
+        status: true
+
+    updateProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        img:
+          type: string
+          description: Imagen del producto
+        code:
+          type: string
+          description: Código único del producto
+        stock:
+          type: integer
+          description: Cantidad disponible del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Estado del producto (activo/inactivo)
+      example:
+        title: "Producto Actualizado"
+        description: "Descripción actualizada del producto"
+        price: 60.00
+        img: "http://example.com/updatedimage.jpg"
+        code: "PROD123"
+        stock: 150
+        category: "Electrodomésticos"
+        status: false

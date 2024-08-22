@@ -1,0 +1,301 @@
+paths:
+  /api/carts:
+    get:
+      tags:
+        - Cart
+      summary: Obtiene todos los carritos.
+      description: Obtener una lista de todos los carritos en la base de datos.
+      operationId: getCarts
+      responses:
+        '200':
+          description: Lista de carritos obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Cart'
+        '500':
+          description: Error al obtener los carritos.
+
+    post:
+      tags:
+        - Cart
+      summary: Crea un nuevo carrito.
+      description: Agrega un nuevo carrito a la base de datos.
+      operationId: addCart
+      responses:
+        '201':
+          description: Carrito creado con éxito.
+        '500':
+          description: Error al crear el carrito.
+
+  /api/carts/{cid}:
+    get:
+      tags:
+        - Cart
+      summary: Obtiene un carrito por ID.
+      description: Obtiene los detalles de un carrito específico por su ID.
+      operationId: getCartById
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalles del carrito obtenidos con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/CartWithDetails'
+        '500':
+          description: Error al obtener el carrito.
+
+    post:
+      tags:
+        - Cart
+      summary: Actualiza un carrito con un producto.
+      description: Actualiza un carrito añadiendo un producto. Solo accesible para roles premium.
+      operationId: updateCart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  description: Cantidad del producto a agregar.
+              required:
+                - quantity
+      responses:
+        '200':
+          description: Carrito actualizado con éxito.
+        '403':
+          description: No autorizado para actualizar el carrito.
+        '404':
+          description: Carrito o producto no encontrado.
+        '500':
+          description: Error al actualizar el carrito.
+
+    delete:
+      tags:
+        - Cart
+      summary: Elimina un producto del carrito.
+      description: Elimina un producto del carrito por su ID.
+      operationId: deleteProductCart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado del carrito con éxito.
+        '404':
+          description: Carrito o producto no encontrado.
+        '500':
+          description: Error al eliminar el producto del carrito.
+
+  /api/carts/{cid}/purchase:
+    post:
+      tags:
+        - Cart
+      summary: Compra el contenido del carrito.
+      description: Realiza la compra del contenido del carrito y genera un ticket. Solo accesible para usuarios autenticados.
+      operationId: purchaseCart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Compra realizada con éxito.
+        '400':
+          description: Algunos productos no tienen stock suficiente.
+        '500':
+          description: Error al realizar la compra.
+
+  /api/carts/{cid}/empty:
+    delete:
+      tags:
+        - Cart
+      summary: Vacía el carrito.
+      description: Elimina todos los productos del carrito por su ID.
+      operationId: emptyCart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Carrito vacío con éxito.
+        '404':
+          description: Carrito no encontrado.
+        '500':
+          description: Error al vaciar el carrito.
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+                description: ID del producto
+              quantity:
+                type: integer
+                description: Cantidad del producto
+      example:
+        _id: "60d21b4667d0d8992e610c85"
+        products:
+          - product: "60d21b4667d0d8992e610c86"
+            quantity: 2
+
+    CartWithDetails:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                $ref: '#components/schemas/Product'
+              quantity:
+                type: integer
+                description: Cantidad del producto
+        totalCart:
+          type: number
+          description: Total del carrito
+      example:
+        _id: "60d21b4667d0d8992e610c85"
+        products:
+          - product:
+              _id: "60d21b4667d0d8992e610c86"
+              title: "Producto Ejemplo"
+              price: 99.99
+            quantity: 2
+        totalCart: 199.98
+
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del producto
+        title:
+          type: string
+          description: Título del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        img:
+          type: string
+          description: Imagen del producto
+        code:
+          type: string
+          description: Código único del producto
+        stock:
+          type: integer
+          description: Cantidad disponible del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Estado del producto (activo/inactivo)
+        owner:
+          type: object
+          properties:
+            role:
+              type: string
+              enum:
+                - admin
+                - premium
+              description: Rol del usuario que posee el producto
+            userId:
+              type: string
+              description: ID del usuario que posee el producto
+      example:
+        _id: "60d21b4667d0d8992e610c86"
+        title: "Producto Ejemplo"
+        description: "Descripción del producto de ejemplo"
+        price: 99.99
+        img: "http://example.com/image.jpg"
+        code: "PROD123"
+        stock: 100
+        category: "Electrónica"
+        status: true
+        owner:
+          role: "premium"
+          userId: "60d21b4667d0d8992e610c87"
+
+    requestBodies:
+      createCart:
+        type: object
+        properties:
+          products:
+            type: array
+            items:
+              type: object
+              properties:
+                product:
+                  type: string
+                  description: ID del producto
+                quantity:
+                  type: integer
+                  description: Cantidad del producto
+        example:
+          products:
+            - product: "60d21b4667d0d8992e610c86"
+              quantity: 2

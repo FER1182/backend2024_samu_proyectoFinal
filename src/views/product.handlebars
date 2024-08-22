@@ -1,0 +1,26 @@
+<div class="product">
+
+    <h1>Producto {{productoFinal.title}}</h1>
+    <div class="card-group">
+
+        <div>
+            <div class="card" style="width: 10rem;">
+                <img src={{productoFinal.img}} class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{productoFinal.title}}</h5>
+                    <p>descripcion {{productoFinal.description}}</p>
+                    <p>precio : $ {{productoFinal.price}}</p>
+                    <p>categoria : {{productoFinal.category}}</p>
+                    <p>id cart : {{productoFinal.idCarrito}}</p>
+
+                    <form action="/api/carts/{{idCarrito}}/product/{{productoFinal._id}}" method="post">
+                        <button type="submit" class="add-to-cart">agregar al Carrito</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

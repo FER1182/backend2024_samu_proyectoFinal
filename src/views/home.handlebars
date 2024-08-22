@@ -1,0 +1,62 @@
+{{#if user}}
+<header class="bg-light p-3 mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <p class="mb-1">Bienvenido, {{user.first_name}} {{user.last_name}}!</p>
+            <p class="mb-1">Rol: {{user.role}}</p>
+            <p class="mb-1">ID del Carrito: {{user.idCart}}</p>
+            <a href="/api/sessions/logout" class="btn btn-danger">Logout</a>
+        </div>
+        <a href="/api/carts/{{user.idCart}}" class="btn btn-info">Ver carrito</a>
+    </div>
+</header>
+{{/if}}
+
+<div class="container">
+    <h1 class="mb-4">Productos</h1>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {{#each productoFinal}}
+        <div class="col">
+            <div class="card h-100">
+                <img src="{{this.rest.img}}" class="card-img-top" alt="{{this.rest.title}}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{this.rest.title}}</h5>
+                    <p class="card-text">Descripción: {{this.rest.description}}</p>
+                    <p class="card-text">Precio: ${{this.rest.price}}</p>
+                    <p class="card-text">Categoría: {{this.rest.category}}</p>
+                    <a href="/api/products/{{this._id}}" class="btn btn-primary">Ver detalles</a>
+                    <form action="/api/carts/{{idCarrito}}/product/{{this._id}}" method="post" class="mt-2">
+                        <button type="submit" class="btn btn-success">Agregar al carrito</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+            {{#if hasPrevPage}}
+            <li class="page-item">
+                <a class="page-link" href="/api/products?limit={{limit}}&page={{prevPage}}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {{/if}}
+
+            {{#if hasNextPage}}
+            <li class="page-item">
+                <a class="page-link" href="/api/products?limit={{limit}}&page={{nextPage}}" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {{/if}}
+        </ul>
+    </nav>
+
+    <div class="text-center mt-4">
+        <p>Página {{currentPage}} de {{totalPages}}</p>
+     
+    </div>
+</div>
