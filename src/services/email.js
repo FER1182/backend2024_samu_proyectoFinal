@@ -51,6 +51,24 @@ class EmailManager {
       console.log("error al enviar el correo de restablecimiento", error);
     }
   }
+
+  async enviarCorreoEliminacion(email, first_name) {
+    try {
+      const mailOptions = {
+        from: "CoderHouse",
+        to: email,
+        subject: "Cuenta eliminada por inactividad",
+        html: `<div>
+                        <h1>Hola ${first_name}</h1>
+                        <p>Tu cuenta ha sido eliminada debido a la inactividad en los últimos 30 minutos.</p>
+                        <p>Si crees que esto es un error, por favor contáctanos.</p>
+                        </div>`,
+      };
+      return await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.log("Error al enviar el correo de eliminación por inactividad", error);
+    }
+  }
 }
 
 export default EmailManager;

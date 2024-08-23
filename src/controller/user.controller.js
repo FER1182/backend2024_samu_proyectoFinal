@@ -31,11 +31,14 @@ export default class UserController {
         return res.status(403).send("Acceso Denegado solo para administradores");
       }
       const users = await userRepository.getUsers();
+     
       const usersMapeado= users.map(user => ({
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
         role: user.role,
+        idUser: user._id,
+        lastConection: user.last_connection
       }));
       res.status(200).render('users', { users: usersMapeado });
     } catch (error) {
@@ -97,6 +100,23 @@ export default class UserController {
       res.status(200).json(user);
     } catch (error) {
       res.status(500).send("Error al eliminar el usuario");
+    }
+  }
+  async deleteInactiveUsers(req, res) {
+    try {
+      // Calcular la fecha límite (últimos 30 minutos)
+      const treintaMinutosAtras = new Date(Date.now() - 30 * 60 * 1000);
+      
+      // Eliminar usuarios inactivos y obtener la lista de usuarios eliminados
+      const inactiveUsers = await userRepository.removeInactiveUsers(treintaMinutosAtras);
+      for (const user of inactiveUsers) {
+        
+        await emailManager.enviarCorreoEliminacion(user.email, user.first_name);
+      }
+
+      res.status(200).send("Usuarios inactivos eliminados y notificados por correo.");
+    } catch (error) {
+      res.status(500).send(`Error al eliminar usuarios inactivos: ${error.message}`);
     }
   }
 
@@ -162,7 +182,7 @@ export default class UserController {
 
   async cambioRolPremium(req, res) {
     const uid = req.params.uid;
-
+    
     try {
       const user = await userRepository.getUserById(uid);
 

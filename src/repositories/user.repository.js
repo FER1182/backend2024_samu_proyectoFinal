@@ -36,11 +36,11 @@ export default class UserRepository {
         return res.status(400).send("el correo ya esta registrado");
       }
       const creaCarrito = await cartRepository.addCart();
-      
+
       //definimos el rol del usuario
-      
+
       const role = email === "admincoder@coder.com" ? "admin" : "usuario";
-      
+
       //creacion de nuevo usuario
       const nuevoUsuario = await UsuarioModel.create({
         first_name,
@@ -48,12 +48,11 @@ export default class UserRepository {
         email,
         password: createHash(password),
         age,
-        carts:creaCarrito._id,
+        carts: creaCarrito._id,
         role,
       });
 
       return nuevoUsuario;
-     
     } catch (error) {
       throw new Error(`Error adding user: ${error.message}`);
     }
@@ -72,6 +71,24 @@ export default class UserRepository {
       return await UsuarioModel.findByIdAndDelete(id);
     } catch (error) {
       throw new Error(`Error deleting user with id ${id}: ${error.message}`);
+    }
+  }
+
+  async removeInactiveUsers(tiempoInactividad) {
+    try {
+      // Buscar usuarios inactivos
+      const inactiveUsers = await UsuarioModel.find({
+        last_connection: { $lt: tiempoInactividad },
+      });
+
+      // Eliminar los usuarios inactivos
+      await UsuarioModel.deleteMany({
+        _id: { $in: inactiveUsers.map((user) => user._id) },
+      });
+
+      return inactiveUsers; // Retornar los usuarios eliminados para enviarles un correo
+    } catch (error) {
+      throw new Error(`Error removing inactive users: ${error.message}`);
     }
   }
 }

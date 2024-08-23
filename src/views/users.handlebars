@@ -1,11 +1,14 @@
 <div class="container">
     <h1 class="mt-5">Lista de Usuarios</h1>
+     <button class="btn btn-danger mb-3" onclick="eliminarUsuariosInactivos()">Eliminar Usuarios Inactivos</button>
+
     <table class="table table-striped mt-3">
       <thead>
         <tr>
           <th>Nombre</th>
           <th>Correo</th>
           <th>Tipo de Cuenta</th>
+          <th>Ultima Conexión</th>
         </tr>
       </thead>
       <tbody>
@@ -14,11 +17,78 @@
           <td>{{first_name}} {{last_name}}</td>
           <td>{{email}}</td>
           <td>{{role}}</td>
+          <td>{{lastConection}}</td>
             <td>
-            <button class="btn btn-primary" onclick="cambiarRol('{{_id}}')">Cambiar Rol</button>
+            <button class="btn btn-primary" onclick="cambiarRol('{{idUser}}')">Cambiar Rol</button>
+            <!-- Botón para eliminar el usuario -->
+          <button class="btn btn-danger" onclick="eliminarUsuario('{{idUser}}')">Eliminar Usuario</button>
+        </td> 
           </td>
         </tr>
         {{/each}}
       </tbody>
     </table>
   </div>
+
+   <script>
+  // Función para eliminar usuarios inactivos
+  function eliminarUsuariosInactivos() {
+    fetch('/api/users/deleteInactive', {
+      method: 'DELETE',
+    })
+    .then(response => {
+      if (response.ok) {
+        alert('Usuarios inactivos eliminados exitosamente.');
+        location.reload(); // Recargar la página para actualizar la lista de usuarios
+      } else {
+        alert('Error al eliminar usuarios inactivos.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error al eliminar usuarios inactivos.');
+    });
+  }
+
+  // Función para cambiar el rol de un usuario
+  function cambiarRol(userId) {
+   
+    fetch(`/api/users/premium/${userId}`, {
+      method: 'PUT',
+    })
+    .then(response => {
+      if (response.ok) {
+        alert('Rol de usuario cambiado exitosamente.');
+        location.reload(); // Recargar la página para reflejar el cambio de rol
+      } else {
+        response.text().then((text) => {
+          alert(`Error al cambiar el rol: ${text}`);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error al cambiar el rol de usuario.');
+    });
+  }
+   // Función para eliminar un usuario
+  function eliminarUsuario(userId) {
+    fetch(`/api/users/${userId}`, {
+      method: 'DELETE',
+    })
+    .then(response => {
+      if (response.ok) {
+        alert('Usuario eliminado exitosamente.');
+        location.reload(); // Recargar la página para actualizar la lista de usuarios
+      } else {
+        response.text().then((text) => {
+          alert(`Error al eliminar el usuario: ${text}`);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error al eliminar el usuario.');
+    });
+  }
+</script>

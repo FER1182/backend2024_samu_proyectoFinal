@@ -9,7 +9,9 @@ router.get("/",passport.authenticate("jwt", { session: false }), userController.
 router.get("/:id", userController.getUserById);
 router.put("/:id", userController.updateUser);
 router.post("/",userController.createUser); 
+router.delete("/deleteInactive", userController.deleteInactiveUsers);
 router.delete("/:id", userController.deleteUser);
+
 
 router.post("/requestPasswordReset", userController.requestPasswordReset);
 router.post("/reset-password", userController.resetPassword);
