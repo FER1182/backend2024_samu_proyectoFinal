@@ -2,7 +2,7 @@ import UserRepository from "../repositories/user.repository.js";
 const userRepository = new UserRepository();
 import jwt from "jsonwebtoken";
 import generarResetToken from "../utils/tokenreset.js";
-
+import path from  "path"
 import EmailManager from "../services/email.js";
 import { createHash, isValidPassword } from "../utils/hashbcrypt.js";
 const emailManager = new EmailManager();
@@ -180,6 +180,8 @@ export default class UserController {
     }
   }
 
+  
+
   async cambioRolPremium(req, res) {
     const uid = req.params.uid;
     
@@ -191,10 +193,14 @@ export default class UserController {
       }
       const documentacionRequerida = ["Identificacion", "Comprobante de domicilio", "Comprobante de estado de cuenta"];
 
-      const userDocuments = user.documents.map(doc => doc.name);
+      const userDocuments = user.documents.map(doc => path.basename(doc.name, path.extname(doc.name)));
+        console.log(userDocuments);
 
+
+      // const userDocuments = user.documents.map(doc => doc.name);
+      // console.log(userDocuments);
       const tieneDocumentacion = documentacionRequerida.every(doc => userDocuments.includes(doc));
-
+      console.log(tieneDocumentacion);
       if (!tieneDocumentacion) {
           return res.status(400).send("El usuario tiene que completar toda la documentacion requerida");
       }
