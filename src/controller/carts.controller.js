@@ -58,8 +58,10 @@ export default class CartsController {
         const idCart = req.params.cid;
         const idProduct = req.params.pid;
         const cantProdAgregado = req.body.quantity;
-        if (req.user.role === "premium") {
+        const product = await productRepository.getProductById(idProduct);
+        if (req.user.role === "premium" && product.owner.role === "premium") {
           const product = await productRepository.getProductById(idProduct);
+          
           if (product.owner.userId === req.user.userId) {
             const cart = await cartRepository.updateCartYagrega(
               idCart,
